@@ -1,7 +1,7 @@
 package = "vardir"
 version = "scm-1"
 source = {
-    url = "https://github.com/mah0x211/lua-vardir.git"
+    url = "git://github.com/mah0x211/lua-vardir.git"
 }
 description = {
     summary = "",
