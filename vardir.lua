@@ -116,15 +116,17 @@ end
 -- @param sym
 -- @return node
 local function get( node, seg, sym )
-    if node[SYM_TRAIL] then
-        node = node[SYM_TRAIL];
-    end
+    if seg then
+        if node[SYM_TRAIL] then
+            node = node[SYM_TRAIL];
+        end
 
-    -- there is not vnode segment
-    if byte( seg ) ~= sym then
-        return node[seg];
-    elseif #seg > 1 and node[SYM_VAR] and node[SYM_VAR].name == seg:sub( 2 ) then
-        return node[SYM_VAR].node;
+        -- there is not vnode segment
+        if byte( seg ) ~= sym then
+            return node[seg];
+        elseif #seg > 1 and node[SYM_VAR] and node[SYM_VAR].name == seg:sub( 2 ) then
+            return node[SYM_VAR].node;
+        end
     end
 end
 
@@ -136,18 +138,20 @@ end
 -- @param path
 -- @return node
 local function trace( node, seg, sym, path )
-    if node[SYM_TRAIL] then
-        path[#path + 1] = { SYM_TRAIL, node };
-        node = node[SYM_TRAIL];
-    end
+    if seg then
+        if node[SYM_TRAIL] then
+            path[#path + 1] = { SYM_TRAIL, node };
+            node = node[SYM_TRAIL];
+        end
 
-    -- there is not vnode segment
-    if byte( seg ) ~= sym then
-        path[#path + 1] = { seg, node };
-        return node[seg];
-    elseif #seg > 1 and node[SYM_VAR] and node[SYM_VAR].name == seg:sub( 2 ) then
-        path[#path + 1] = { SYM_VAR, node };
-        return node[SYM_VAR].node;
+        -- there is not vnode segment
+        if byte( seg ) ~= sym then
+            path[#path + 1] = { seg, node };
+            return node[seg];
+        elseif #seg > 1 and node[SYM_VAR] and node[SYM_VAR].name == seg:sub( 2 ) then
+            path[#path + 1] = { SYM_VAR, node };
+            return node[SYM_VAR].node;
+        end
     end
 end
 
@@ -158,18 +162,20 @@ end
 -- @param glob
 -- @param node
 local function resolve( node, seg, glob )
-    if node[SYM_TRAIL] then
-        node = node[SYM_TRAIL];
-    end
+    if seg then
+        if node[SYM_TRAIL] then
+            node = node[SYM_TRAIL];
+        end
 
-    -- found segment
-    if node[seg] then
-        return node[seg];
-    -- found variable-segment
-    elseif node[SYM_VAR] then
-        node = node[SYM_VAR];
-        glob[node.name] = seg;
-        return node.node;
+        -- found segment
+        if node[seg] then
+            return node[seg];
+        -- found variable-segment
+        elseif node[SYM_VAR] then
+            node = node[SYM_VAR];
+            glob[node.name] = seg;
+            return node.node;
+        end
     end
 end
 
@@ -184,20 +190,22 @@ local function pickup( node, seg, eos )
         eos[#eos + 1] = node[SYM_EOS];
     end
 
-    if node[SYM_TRAIL] then
-        node = node[SYM_TRAIL];
-        if node[SYM_EOS] then
-            eos[#eos + 1] = node[SYM_EOS];
+    if seg then
+        if node[SYM_TRAIL] then
+            node = node[SYM_TRAIL];
+            if node[SYM_EOS] then
+                eos[#eos + 1] = node[SYM_EOS];
+            end
         end
-    end
 
-    -- found segment
-    if node[seg] then
-        return node[seg];
-    -- found variable-segment
-    elseif node[SYM_VAR] then
-        node = node[SYM_VAR];
-        return node.node;
+        -- found segment
+        if node[seg] then
+            return node[seg];
+        -- found variable-segment
+        elseif node[SYM_VAR] then
+            node = node[SYM_VAR];
+            return node.node;
+        end
     end
 end
 
@@ -231,6 +239,7 @@ local function traverse( node, key, fn, ... )
 
     -- trailing-slash
     if pos > #key then
+        fn( node, nil, ... );
         if not node[SYM_TRAIL] then
             return nil;
         end
